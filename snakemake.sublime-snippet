@@ -1,0 +1,31 @@
+<snippet>
+    <content>
+    <![CDATA[
+rule ${1:name}:
+    input:
+        ${2:inputs}
+    output:
+        ${3:outputs}
+    shell:
+        "${4:shell}"
+    ]]>
+    </content>
+    <tabTrigger>sshell</tabTrigger>
+    <scope>source.python</scope>
+</snippet>
+
+<snippet>
+    <content>
+    <![CDATA[
+rule ${1:name}:
+    input:
+        ${2:inputs}
+    output:
+        ${3:outputs}
+    script:
+        "${4:shell}"
+    ]]>
+    </content>
+    <tabTrigger>sscript</tabTrigger>
+    <scope>source.python</scope>
+</snippet>

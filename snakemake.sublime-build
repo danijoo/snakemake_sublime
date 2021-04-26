@@ -1,0 +1,17 @@
+{
+    "selector": "source.python",
+    "file_patterns": ["Snakefile", "*.snake", "*.rules", "*.smk"],
+    "keyfiles": ["Snakefile"],
+    "target": "snakemake_build",
+    "variants": [
+        {
+            "name": "Run (with args)",
+            "wants_args": true
+        },
+        {
+            "name": "Cancel run",
+            "kill": true
+        }
+    ]
+
+}
