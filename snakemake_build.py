@@ -16,6 +16,7 @@ class SnakemakeBuildCommand(sublime_plugin.WindowCommand):
     proc = None
 
     working_dir = None
+    snakefile = "Snakefile"
     run_args = ""
 
     def run(self,  kill=False, wants_args=False):
@@ -24,7 +25,13 @@ class SnakemakeBuildCommand(sublime_plugin.WindowCommand):
             return
 
         vars = self.window.extract_variables()
-        self.working_dir = vars['file_path']
+        if "file_path" in vars:
+            self.working_dir = vars['file_path']
+
+        # project arguments
+        project_data = self.get_project_data()
+        self.working_dir = project_data.get("working_dir", self.working_dir)
+        self.snakefile = project_data.get("snakefile", self.snakefile)
 
         # Select rule
         if wants_args:
@@ -47,12 +54,15 @@ class SnakemakeBuildCommand(sublime_plugin.WindowCommand):
         if not "--cores" in cmd and not "--jobs" in cmd and not "-j" in cmd:
             cmd = ["-j", "all"] + cmd
         if not "--snakefile" in cmd and not "-s" in cmd:
-            cmd = ["-s", "Snakefile"] + cmd
+            cmd = ["-s", self.snakefile] + cmd
 
         cmd = ["snakemake"] + cmd
 
         with self.panel_lock:
             self.setup_panel()
+
+        if self.working_dir is None:
+            raise ValueError("No file opened and no working dir specified in project.")
 
         # run the command in a separate thread
         self.queue_write("[" + " ".join(cmd) + "]\n")
@@ -71,6 +81,9 @@ class SnakemakeBuildCommand(sublime_plugin.WindowCommand):
         self.run_args = run_args
         self.run_snakemake()
 
+    def get_project_data(self):
+        data = self.window.project_data()
+        return data.get("snakemake", {})
 
     def kill_run(self):
         if self.proc:
